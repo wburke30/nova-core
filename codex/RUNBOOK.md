@@ -6,10 +6,10 @@ Defines the exact build sequence for NOVA.
 
 Ensures:
 
-- correct order of implementation
+- correct order of execution
 - no dependency issues
-- deterministic build process
-- zero ambiguity for Codex
+- no ambiguity
+- full system completion
 
 ---
 
@@ -17,321 +17,210 @@ Ensures:
 
 Steps MUST be executed in EXACT order.
 
-No skipping  
-No reordering  
-No parallel execution (unless explicitly defined)
+NO skipping  
+NO reordering  
+NO assumptions  
 
 ---
 
-## STEP ORDER (LOCKED)
+## GLOBAL ENVIRONMENT RULE (MANDATORY)
+
+Before EACH step:
+
+You MUST:
+
+- verify required dependencies exist
+- install missing dependencies
+- verify services are running
+
+You MUST NOT assume anything exists.
+
+---
+
+# STEP ORDER (LOCKED)
 
 ---
 
 ### STEP 01 — BOOTSTRAP
-
-File:
-```
-01_BOOTSTRAP.md
-```
-
-Requirements:
-
-- create project structure
-- setup backend (FastAPI)
-- setup frontend (Next.js)
-- setup PostgreSQL
-- verify server starts
+File: `/codex/01_BOOTSTRAP.md`
 
 ---
 
 ### STEP 02 — DATABASE
-
-File:
-```
-02_DATABASE.md
-```
-
-Requirements:
-
-- implement ALL tables from `09_DATABASE_SCHEMA.md`
-- run migrations
-- verify schema integrity
+File: `/codex/02_DATABASE.md`
 
 ---
 
 ### STEP 03 — BACKEND CORE
-
-File:
-```
-03_BACKEND_CORE.md
-```
-
-Requirements:
-
-- authentication system
-- user + project context
-- config system integration
+File: `/codex/03_BACKEND_CORE.md`
 
 ---
 
 ### STEP 04 — PIPELINE ENGINE
-
-File:
-```
-04_PIPELINE_ENGINE.md
-```
-
-Requirements:
-
-- implement ALL pipeline stages (03 + 10 docs)
-- verify pipeline run works
+File: `/codex/04_PIPELINE_ENGINE.md`
 
 ---
 
-### STEP 05 — POLICY + APPROVAL
-
-File:
-```
-05_POLICY_RUNTIME.md
-```
-
-Requirements:
-
-- implement policy engine
-- approval system
-- automation rules
+### STEP 05 — POLICY RUNTIME
+File: `/codex/05_POLICY_RUNTIME.md`
 
 ---
 
 ### STEP 06 — EXECUTION ENGINE
-
-File:
-```
-06_EXECUTION_ENGINE.md
-```
-
-Requirements:
-
-- tool execution system
-- execution isolation
-- timeout + cancellation
+File: `/codex/06_EXECUTION_ENGINE.md`
 
 ---
 
-### STEP 07 — QUEUE + WORKERS
-
-File:
-```
-07_QUEUE_WORKERS.md
-```
-
-Requirements:
-
-- job queue system
-- worker execution
-- idempotency
-- distributed locking
+### STEP 07 — QUEUE & WORKERS
+File: `/codex/07_QUEUE_WORKERS.md`
 
 ---
 
-### STEP 08 — EVENTS + WEBSOCKET
-
-File:
-```
-08_EVENTS_WEBSOCKET.md
-```
-
-Requirements:
-
-- event system
-- websocket server
-- real-time updates
+### STEP 08 — EVENTS & WEBSOCKET
+File: `/codex/08_EVENTS_WEBSOCKET.md`
 
 ---
 
 ### STEP 09 — API LAYER
-
-File:
-```
-09_API_LAYER.md
-```
-
-Requirements:
-
-- implement ALL endpoints from API spec
-- enforce auth + permissions
-- validate responses
+File: `/codex/09_API_LAYER.md`
 
 ---
 
 ### STEP 10 — INTEGRATIONS
-
-File:
-```
-10_INTEGRATIONS.md
-```
-
-Requirements:
-
-- connector framework
-- generic API connector
-- test at least one integration
+File: `/codex/10_INTEGRATIONS.md`
 
 ---
 
 ### STEP 11 — FRONTEND SHELL
-
-File:
-```
-11_FRONTEND_SHELL.md
-```
-
-Requirements:
-
-- layout implementation
-- sidebar + navigation
-- MUST follow UI_CONTRACT.md
+File: `/codex/11_FRONTEND_SHELL.md`
 
 ---
 
 ### STEP 12 — FRONTEND REALTIME
-
-File:
-```
-12_FRONTEND_REALTIME.md
-```
-
-Requirements:
-
-- websocket integration
-- live updates
-- task visibility
+File: `/codex/12_FRONTEND_REALTIME.md`
 
 ---
 
-### STEP 13 — SECURITY + OBSERVABILITY
-
-File:
-```
-13_SECURITY.md
-```
-
-Requirements:
-
-- audit logging
-- integration status
-- system monitoring
+### STEP 13 — SECURITY & OBSERVABILITY
+File: `/codex/13_SECURITY.md`
 
 ---
 
 ### STEP 14 — FINAL VALIDATION
-
-File:
-```
-14_FINALIZE.md
-```
-
-Requirements:
-
-- full system test
-- validate against ACCEPTANCE_MATRIX.md
-- verify all features working
+File: `/codex/14_FINALIZE.md`
 
 ---
 
-## VALIDATION REQUIREMENTS (MANDATORY)
+### STEP 15 — API & ROUTE VALIDATION
+File: `/codex/15_API_ROUTE_VALIDATION.md`
 
-After EVERY step:
+---
+
+### STEP 16 — DOCUMENTATION VALIDATION
+File: `/codex/16_DOCS_VALIDATION.md`
+
+---
+
+# VALIDATION RULE (MANDATORY)
+
+After EACH step:
 
 You MUST verify:
 
-- server is running
+- backend server runs
 - database accessible
-- no runtime errors
 - endpoints respond correctly
-- logs are clean
+- logs contain no errors
+
+IF ANY FAILS:
+
+→ STOP  
+→ FIX  
+→ RETRY  
 
 ---
 
-## FAILURE HANDLING
+# FAILURE HANDLING
 
 If step fails:
 
 ```
-→ identify issue
-→ fix
+identify issue
+→ fix issue
 → retry same step
-→ DO NOT proceed until resolved
+→ DO NOT proceed
 ```
 
 ---
 
-## STATE MANAGEMENT
+# STATE MANAGEMENT
 
 You MUST update:
 
-```
-BUILD_STATUS.md
-```
+`/codex/BUILD_STATUS.md`
 
 Example:
 
 ```
 01_BOOTSTRAP: complete
-02_DATABASE: complete
-03_BACKEND_CORE: pending
+02_DATABASE: in_progress
 ```
 
 ---
 
-## RESUME RULE
+# RESUME RULE
 
 If interrupted:
 
 ```
-→ read BUILD_STATUS.md
-→ resume from first incomplete step
+read BUILD_STATUS.md
+→ resume first incomplete step
 ```
 
 ---
 
-## UI ENFORCEMENT
+# UI ENFORCEMENT
 
 Frontend MUST:
 
-- follow UI_CONTRACT.md exactly
-- implement THEME_SYSTEM.md
-- be responsive (desktop/tablet/mobile)
+- follow `/codex/UI_CONTRACT.md`
+- follow `/codex/THEME_SYSTEM.md`
+- be responsive
+- not use polling
 
 ---
 
-## FINAL SYSTEM VALIDATION
+# ACCEPTANCE VALIDATION (CRITICAL)
 
-System MUST confirm:
+Step 14 MUST validate against:
 
-- pipeline execution works end-to-end
-- connectors function correctly
-- node system operational
-- UI fully functional
-- real-time updates working
-- roles execute correctly
+`/codex/ACCEPTANCE_MATRIX.md`
 
 ---
 
-## FORBIDDEN BEHAVIOR
+# COMPLETION RULE
+
+System is complete ONLY IF:
+
+- ALL steps (01–16) complete
+- ALL validations pass
+- NO errors remain
+
+---
+
+# FORBIDDEN BEHAVIOR
 
 You MUST NOT:
 
 - skip steps
-- assume success
-- leave incomplete code
+- assume completion
 - leave TODOs
-- break architecture rules
+- leave partial implementations
 
 ---
 
-## FINAL RULE
+# FINAL RULE
 
-This runbook defines the build process.
+This runbook defines execution.
 
-If runbook is not followed → system build is invalid.
+If it is not followed → build is invalid.

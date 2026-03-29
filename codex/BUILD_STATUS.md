@@ -2,19 +2,12 @@
 
 ## Purpose
 
-Tracks progress of the NOVA build process.
+Tracks the exact state of the NOVA build process.
 
 Used by:
 
 - ORCHESTRATOR.md
 - RUNBOOK.md
-
-Ensures:
-
-- resumable builds
-- deterministic execution
-- no repeated work
-- no skipped steps
 
 ---
 
@@ -37,7 +30,7 @@ failed
 
 ---
 
-## STEP TRACKING (MANDATORY)
+## STEP TRACKING (MANDATORY — LOCKED)
 
 ```
 01_BOOTSTRAP: pending
@@ -54,6 +47,8 @@ failed
 12_FRONTEND_REALTIME: pending
 13_SECURITY: pending
 14_FINALIZE: pending
+15_API_ROUTE_VALIDATION: pending
+16_DOCS_VALIDATION: pending
 ```
 
 ---
@@ -66,7 +61,7 @@ Each step MUST follow:
 pending → in_progress → complete
 ```
 
-OR
+OR (if failure):
 
 ```
 in_progress → failed → retry → complete
@@ -74,12 +69,20 @@ in_progress → failed → retry → complete
 
 ---
 
+## SINGLE ACTIVE STEP RULE
+
+At ANY time:
+
+- ONLY ONE step may be `in_progress`
+
+---
+
 ## UPDATE RULES
 
 After each step:
 
-- mark current step as `complete`
-- update next step to `in_progress`
+1. mark current step → complete
+2. set next step → in_progress
 
 ---
 
@@ -88,50 +91,48 @@ After each step:
 If step fails:
 
 - mark as `failed`
-- DO NOT proceed to next step
-- retry same step until resolved
+- DO NOT proceed
+- retry same step
 
 ---
 
 ## RESUME RULE
 
-If build is interrupted:
+If execution is interrupted:
 
 ```
-1. read BUILD_STATUS.md
-2. find first step NOT complete
-3. resume from that step
+read BUILD_STATUS.md
+→ find first step NOT complete
+→ resume from that step
 ```
-
----
-
-## CONSISTENCY RULE
-
-Only ONE step may be:
-
-```
-in_progress
-```
-
-at any time.
 
 ---
 
 ## VALIDATION RULE
 
-A step may only be marked `complete` if:
+A step may ONLY be marked `complete` if:
 
-- validation checks pass
+- validation passes
 - no runtime errors exist
+
+---
+
+## CONSISTENCY RULE
+
+BUILD_STATUS MUST:
+
+- match RUNBOOK step list exactly
+- include ALL steps (01–16)
+- contain NO extra steps
 
 ---
 
 ## FORBIDDEN BEHAVIOR
 
-System MUST NOT:
+You MUST NOT:
 
 - skip steps
-- mark step complete without validation
+- mark complete without validation
 - run multiple steps simultaneously
 - reset completed steps
 
@@ -139,6 +140,6 @@ System MUST NOT:
 
 ## FINAL RULE
 
-This file controls the build process.
+BUILD_STATUS controls execution.
 
-If BUILD_STATUS is incorrect → orchestration fails.
+If incorrect → system build fails.

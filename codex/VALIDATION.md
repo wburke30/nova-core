@@ -9,7 +9,7 @@ Ensures:
 - no broken steps
 - no partial implementation
 - no hidden errors
-- fully working system
+- full system correctness
 
 ---
 
@@ -25,15 +25,15 @@ Validation MUST occur at:
 
 ---
 
-### 1. Step-Level Validation
+### 1. STEP-LEVEL VALIDATION
 
-After each build step.
+After EACH step.
 
 ---
 
-### 2. System-Level Validation
+### 2. SYSTEM-LEVEL VALIDATION
 
-After full build completion.
+After ALL steps complete.
 
 ---
 
@@ -43,59 +43,58 @@ After EACH step, you MUST verify:
 
 ---
 
-### Server
+### Backend
 
-- backend server runs
-- no startup errors
+- server starts successfully
+- no runtime errors
 
 ---
 
 ### Database
 
-- DB connection works
-- schema exists
+- connection works
+- schema accessible
 - queries succeed
-
----
-
-### Execution
-
-- no runtime exceptions
-- no unhandled errors
 
 ---
 
 ### API
 
 - endpoints respond
-- correct status codes
-- correct response format
+- correct HTTP status codes
+- response format correct
+
+---
+
+### Execution
+
+- no uncaught exceptions
+- no broken logic
 
 ---
 
 ### Logs
 
 - no critical errors
-- no uncaught exceptions
+- no unhandled failures
 
 ---
 
-## VALIDATION FAILURE RULE
+## FAILURE RULE
 
 If ANY validation fails:
 
 ```
-→ STOP
-→ FIX ISSUE
+STOP
+→ FIX
 → RETRY SAME STEP
-→ RE-VALIDATE
 ```
 
 ---
 
-## SYSTEM-LEVEL VALIDATION (FINAL STEP)
+## SYSTEM-LEVEL VALIDATION (FINAL)
 
-After ALL steps complete:
+After Step 16:
 
 ---
 
@@ -103,8 +102,8 @@ After ALL steps complete:
 
 ```
 send message
-→ pipeline runs
-→ execution completes
+→ pipeline executes
+→ stages run correctly
 → result returned
 ```
 
@@ -112,67 +111,138 @@ send message
 
 ### 2. Connector Test
 
-- at least one connector works
+- connector executes
+- mapping works
 - external call succeeds
 
 ---
 
-### 3. Node System Test
+### 3. Queue & Worker Test
 
-- node registers
-- heartbeat updates
-- task routed successfully
-
----
-
-### 4. UI Test
-
-- loads correctly
-- sidebar navigation correct
-- chat is default view
-- no layout issues
+- job created
+- worker processes job
+- result returned
 
 ---
 
-### 5. Real-Time Test
+### 4. Real-Time Test
 
-- websocket connects
-- live updates working
-- no polling fallback
+- WebSocket connects
+- events emitted
+- UI updates instantly
+- NO polling used
 
 ---
 
-### 6. Role System Test
+### 5. Approval System Test
+
+- approval required
+- approval created
+- approval resolves
+- pipeline resumes
+
+---
+
+### 6. Permission Test
+
+- unauthorized blocked
+- role enforcement works
+- precedence rules enforced
+
+---
+
+### 7. Role System Test
 
 - roles applied correctly
 - workflows triggered correctly
 
 ---
 
-### 7. Storage Test
+### 8. Storage Test
 
 - file read/write works
-- storage respects project config
+- correct storage location used
 
 ---
 
-## ACCEPTANCE MATRIX (MANDATORY)
+### 9. Node System Test
 
-System MUST pass:
+- node registers
+- heartbeat updates
+- tasks routed correctly
+
+---
+
+### 10. Error Handling Test
+
+- simulate failure
+- retry works
+- logging works
+
+---
+
+### 11. Security Test
+
+- invalid auth rejected
+- permissions enforced
+- secrets protected
+
+---
+
+### 12. Observability Test
+
+- logs visible
+- integration status visible
+- node status visible
+
+---
+
+### 13. UI Validation
+
+UI MUST:
+
+- match `/codex/UI_CONTRACT.md`
+- correct navigation order
+- responsive (desktop/tablet/mobile)
+- theme switching works
+
+---
+
+### 14. Route Validation
+
+ALL endpoints:
+
+- reachable
+- correct response
+- no 500 errors
+
+---
+
+### 15. Acceptance Matrix
+
+MUST pass:
 
 ```
-ACCEPTANCE_MATRIX.md
+/codex/ACCEPTANCE_MATRIX.md
 ```
 
-If ANY test fails:
+---
 
-→ system is NOT complete
+### 16. Documentation Validation
+
+System MUST match:
+
+```
+/docs/01–72
+```
+
+NO deviations allowed.
 
 ---
 
 ## VALIDATION OUTPUT
 
-Validation MUST produce:
+Each validation MUST produce:
 
 ```json
 {
@@ -186,11 +256,12 @@ Validation MUST produce:
 
 ## FINAL PASS CRITERIA
 
-System is considered complete ONLY if:
+System is COMPLETE ONLY IF:
 
-- all steps = complete
-- all validations = pass
-- no errors remain
+- ALL steps (01–16) complete
+- ALL validations pass
+- NO errors remain
+- NO spec drift exists
 
 ---
 
@@ -199,9 +270,9 @@ System is considered complete ONLY if:
 System MUST NOT:
 
 - skip validation
-- mark step complete without testing
 - ignore errors
 - assume functionality
+- mark complete prematurely
 
 ---
 
