@@ -1,191 +1,202 @@
-NOVA BUILD STEP 16 — DOCUMENTATION VALIDATION (MANDATORY)
+# NOVA — Documentation Validation (Authoritative)
 
---------------------------------
-GOAL
---------------------------------
+## Purpose
 
-Verify implementation matches ALL documentation:
+Verifies that the implementation matches ALL system specifications.
 
-- docs 01–69
-- architecture rules
-- system invariants
+Ensures:
 
----
-
---------------------------------
-NON-NEGOTIABLE RULES
---------------------------------
-
-- NO spec deviation allowed
-- NO missing features allowed
-- NO shortcuts allowed
-
-IF ANY FAIL:
-→ FIX
-→ RETRY
+- no drift from architecture
+- no missing features
+- full compliance with design
 
 ---
 
---------------------------------
-STEP 1 — MATCH CORE RULES
---------------------------------
+## CORE RULE
+
+Implementation MUST match ALL documents in `/docs/01–72`.
+
+No deviation allowed.
+
+---
+
+## VALIDATION SCOPE
+
+You MUST validate against:
+
+```
+/docs/01–72
+```
+
+NOT 01–69  
+NOT partial sets  
+NOT assumed subsets  
+
+---
+
+## VALIDATION TASKS
+
+---
+
+### 1. CORE ARCHITECTURE
 
 Verify:
 
 - pipeline controls ALL execution
-- no direct execution
-- connectors enforced
-- mapping enforced
+- no direct execution exists
+- tools only execute via pipeline
+- connectors handle ALL external calls
 
 ---
 
---------------------------------
-STEP 2 — MATCH DATA MODEL
---------------------------------
+### 2. DATA MODEL
 
 Verify:
 
-- canonical model implemented
-- schema matches exactly
+- canonical data model implemented exactly
+- database schema matches spec
 - no missing fields
 
 ---
 
---------------------------------
-STEP 3 — MATCH WORKFLOW ENGINE
---------------------------------
+### 3. WORKFLOW ENGINE
 
 Verify:
 
+- deterministic execution
 - compensation enforced
-- retry rules enforced
-- no ambiguity
+- retry logic correct
 
 ---
 
---------------------------------
-STEP 4 — MATCH REAL-TIME SYSTEM
---------------------------------
+### 4. REAL-TIME SYSTEM
 
 Verify:
 
-- event-driven
-- websocket-only updates
-- no polling
+- event-driven architecture
+- WebSocket updates ONLY
+- NO polling for live updates
 
 ---
 
---------------------------------
-STEP 5 — MATCH UI CONTRACT
---------------------------------
+### 5. UI CONTRACT
 
 Verify:
 
-- sidebar order correct
-- chat default
-- responsive
-- theme works
+- UI matches `/codex/UI_CONTRACT.md`
+- navigation order correct
+- chat is default
+- responsive behavior works
 
 ---
 
---------------------------------
-STEP 6 — MATCH SECURITY
---------------------------------
+### 6. SECURITY
 
 Verify:
 
-- auth enforced
+- authentication enforced
 - permissions enforced
 - secrets protected
+- inputs sanitized
 
 ---
 
---------------------------------
-STEP 7 — MATCH CONNECTOR FRAMEWORK
---------------------------------
+### 7. CONNECTOR FRAMEWORK
 
 Verify:
 
-- all integrations use connectors
+- ALL integrations use connectors
 - no direct API calls
 - mapping enforced
 
 ---
 
---------------------------------
-STEP 8 — MATCH ROLE SYSTEM
---------------------------------
+### 8. ROLE SYSTEM
 
 Verify:
 
 - roles separate from permissions
 - role composition works
+- permissions not overridden
 
 ---
 
---------------------------------
-STEP 9 — MATCH TENANCY MODEL
---------------------------------
+### 9. TENANCY MODEL
 
 Verify:
 
 - single-tenant enforced
 - project isolation works
+- no cross-project data leakage
 
 ---
 
---------------------------------
-FINAL VALIDATION
---------------------------------
+### 10. STORAGE SYSTEM
 
-System MUST:
+Verify:
 
-- match ALL specs
-- contain ZERO drift
-- pass ALL rules
+- storage follows configuration
+- correct provider used
+- no uncontrolled file access
 
 ---
 
---------------------------------
-FAIL CONDITIONS
---------------------------------
+## VALIDATION METHOD
 
-FAIL IF:
+For each rule:
 
-- any rule not implemented
-- any spec mismatch
-- any shortcut detected
-
-IF FAIL:
-→ FIX
-→ RETRY
+- compare implementation to spec
+- confirm behavior matches exactly
+- reject any mismatch
 
 ---
 
---------------------------------
-COMPLETION CRITERIA
---------------------------------
+## VALIDATION OUTPUT
 
-COMPLETE ONLY IF:
+You MUST produce:
 
-- system matches docs 100%
-- no ambiguity exists
-- fully production ready
-
----
-
---------------------------------
-STATE UPDATE
---------------------------------
-
-16_DOCS_VALIDATION: complete
+```json
+{
+  "validation": "docs",
+  "status": "pass|fail",
+  "errors": []
+}
+```
 
 ---
 
---------------------------------
-FINAL OUTPUT
---------------------------------
+## FAILURE RULE
 
-System is verified.
+If ANY mismatch found:
 
-STOP.
+→ FAIL  
+→ list exact issue  
+→ STOP execution  
+
+---
+
+## COMPLETION CRITERIA
+
+Validation passes ONLY IF:
+
+- ALL docs (01–72) match implementation
+- NO mismatches exist
+- NO ambiguity exists
+
+---
+
+## FORBIDDEN BEHAVIOR
+
+You MUST NOT:
+
+- skip documents
+- assume compliance
+- partially validate
+
+---
+
+## FINAL RULE
+
+Documentation defines system truth.
+
+If implementation does not match docs → system is invalid.

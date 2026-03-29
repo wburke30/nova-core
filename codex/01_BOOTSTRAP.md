@@ -4,15 +4,14 @@ NOVA BUILD STEP 01 — BOOTSTRAP (MANDATORY)
 GOAL
 --------------------------------
 
-Initialize a fully working NOVA base system with:
+Initialize NOVA system inside EXISTING repository.
 
-- FastAPI backend
-- Next.js frontend
-- PostgreSQL database
-- WebSocket support
-- Clean project structure
+System MUST:
 
-System MUST run successfully after this step.
+- use current repo root
+- NOT create nested /nova/ directory
+- setup backend + frontend + database
+- be fully runnable
 
 ---
 
@@ -20,32 +19,33 @@ System MUST run successfully after this step.
 NON-NEGOTIABLE RULES
 --------------------------------
 
-- DO NOT skip any task
-- DO NOT assume anything
-- DO NOT use placeholders
-- DO NOT leave TODOs
-- DO NOT stop early
+- DO NOT create /nova/ folder
+- DO NOT change root structure
+- DO NOT assume dependencies exist
 
-IF ANY ERROR OCCURS:
-→ FIX IT IMMEDIATELY
+IF ANY ERROR:
+→ FIX
 → RETRY
-→ CONTINUE
 
 ---
 
 --------------------------------
-PROJECT STRUCTURE (MUST MATCH EXACTLY)
+ENVIRONMENT CHECK (MANDATORY)
 --------------------------------
 
-Create:
+Before ANY setup:
 
-/nova/
-  /backend/
-  /frontend/
-  /infra/
-  /docker/
-  docker-compose.yml
-  README.md
+VERIFY OR INSTALL:
+
+- Python 3.11+
+- Node.js (LTS)
+- npm or pnpm
+- PostgreSQL (or container)
+- Git
+
+IF MISSING:
+→ INSTALL  
+→ VERIFY  
 
 ---
 
@@ -53,33 +53,42 @@ Create:
 STEP 1 — BACKEND SETUP
 --------------------------------
 
-Create FastAPI backend.
+Create:
 
-REQUIREMENTS:
+/backend/
 
-- Python 3.11+
-- FastAPI
-- Uvicorn
+Inside:
 
-Create file:
-
-/backend/main.py
-
-MUST CONTAIN:
-
-- FastAPI app instance
-- root route: GET /
-
-RETURN:
-
-{
-  "status": "NOVA backend running"
-}
+- app/
+- main.py
 
 ---
 
 --------------------------------
-STEP 2 — BACKEND DEPENDENCIES
+STEP 2 — FASTAPI APP
+--------------------------------
+
+Create:
+
+/backend/app/main.py
+
+MUST:
+
+- initialize FastAPI
+- create root route `/`
+
+RETURN:
+
+```json
+{
+  "status": "NOVA backend running"
+}
+```
+
+---
+
+--------------------------------
+STEP 3 — BACKEND DEPENDENCIES
 --------------------------------
 
 Create:
@@ -88,84 +97,84 @@ Create:
 
 MUST INCLUDE:
 
-fastapi
-uvicorn
-psycopg2-binary
-sqlalchemy
+- fastapi
+- uvicorn
+- sqlalchemy
+- psycopg2-binary
 
 Install dependencies.
 
 ---
 
 --------------------------------
-STEP 3 — FRONTEND SETUP
+STEP 4 — FRONTEND SETUP
 --------------------------------
 
-Create Next.js app:
+Create:
 
 /frontend/
 
-REQUIREMENTS:
+Use:
 
-- Next.js (App Router)
+- Next.js
 - TypeScript
 - TailwindCSS
 
 ---
 
 --------------------------------
-STEP 4 — FRONTEND ROOT PAGE
+STEP 5 — FRONTEND ROOT PAGE
 --------------------------------
 
 Create:
 
 /frontend/app/page.tsx
 
-MUST RENDER:
+MUST render:
 
-- simple page
-- text: "NOVA UI running"
+"NOVA UI running"
 
 ---
 
 --------------------------------
-STEP 5 — DATABASE SETUP
+STEP 6 — DATABASE SETUP
 --------------------------------
 
-Use PostgreSQL.
+Ensure PostgreSQL:
 
-MUST:
-
-- connect successfully
-- create connection utility
+IF not running:
+→ start OR create container
 
 Create:
 
-/backend/db.py
+/backend/app/db.py
 
 MUST:
 
-- establish DB connection
-- handle connection errors
+- connect to DB
+- handle errors
+- verify connection
 
 ---
 
 --------------------------------
-STEP 6 — DOCKER SETUP
+STEP 7 — DOCKER SETUP (OPTIONAL BUT PREFERRED)
 --------------------------------
 
-Create docker-compose.yml
+Create:
 
-MUST INCLUDE:
+docker-compose.yml
 
-- backend service
-- frontend service
-- postgres service
+MUST include:
+
+- backend
+- frontend
+- postgres
 
 ---
 
 --------------------------------
-STEP 7 — WEBSOCKET BASE
+STEP 8 — WEBSOCKET BASE
 --------------------------------
 
 Add WebSocket endpoint:
@@ -175,23 +184,19 @@ Add WebSocket endpoint:
 MUST:
 
 - accept connection
-- send test message:
-  "connected"
+- return "connected"
 
 ---
 
 --------------------------------
-STEP 8 — RUN SYSTEM
+STEP 9 — RUN SYSTEM
 --------------------------------
 
-Start system.
+Start:
 
-MUST VERIFY:
-
-1. Backend runs (http://localhost:8000)
-2. Frontend runs (http://localhost:3000)
-3. Database connects
-4. WebSocket connects
+- backend (port 8000)
+- frontend (port 3000)
+- database
 
 ---
 
@@ -201,10 +206,10 @@ VALIDATION (MANDATORY)
 
 ALL MUST PASS:
 
-- backend returns correct response
-- frontend loads page
-- database connection successful
-- websocket returns "connected"
+- backend returns response
+- frontend loads
+- DB connects
+- websocket connects
 - NO runtime errors
 
 ---
@@ -215,10 +220,9 @@ FAIL CONDITIONS
 
 FAIL IF:
 
-- any service does not start
-- any endpoint fails
+- any service fails
+- any dependency missing
 - any error in logs
-- any missing dependency
 
 IF FAIL:
 → FIX
@@ -230,21 +234,19 @@ IF FAIL:
 COMPLETION CRITERIA
 --------------------------------
 
-This step is COMPLETE ONLY IF:
+COMPLETE ONLY IF:
 
-- all services run successfully
-- all validations pass
+- system runs cleanly
 - no errors exist
+- all services operational
 
 ---
 
 --------------------------------
-OUTPUT REQUIREMENT
+STATE UPDATE
 --------------------------------
 
-DO NOT summarize.
-
-Proceed to next step automatically.
+01_BOOTSTRAP: complete
 
 ---
 
@@ -252,12 +254,6 @@ Proceed to next step automatically.
 NEXT STEP
 --------------------------------
 
-After completion:
-
-→ Update BUILD_STATUS.md
-
-01_BOOTSTRAP: complete
-
-→ Proceed to:
+Proceed to:
 
 02_DATABASE.md
