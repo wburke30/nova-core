@@ -1,202 +1,108 @@
-# NOVA — ORCHESTRATOR (Authoritative)
+# NOVA — ORCHESTRATOR (Deterministic Local Build)
 
 ## Purpose
 
-Defines the execution controller responsible for:
+Define a command-based, fully local, fail-fast build process that runs with one command:
 
-- coordinating all Codex build steps
-- maintaining state
-- enforcing validation
-- recovering from failures
-- ensuring full system completion
-
----
-
-## CORE RULE
-
-You are NOT assisting.
-
-You are BUILDING the system completely.
-
----
-
-## EXECUTION MODEL
-
-This system follows a **stateful orchestration loop**:
-
-```
-read state → execute step → validate → update state → continue
+```bash
+./build.sh
 ```
 
----
-
-## REQUIRED FILES
-
-You MUST use:
-
-- RUNBOOK.md → defines build order
-- BUILD_STATUS.md → tracks progress
-- VALIDATION.md → enforces correctness
-- UI_CONTRACT.md → locks UI
-- THEME_SYSTEM.md → enforces theming
+No tool-calling orchestration is used.
 
 ---
 
-## ORCHESTRATION LOOP (MANDATORY)
+## Core Execution Contract
 
-Repeat continuously:
+- Build order is sourced only from `/codex/RUNBOOK.md`.
+- Each step file path in RUNBOOK must exist.
+- Steps execute strictly in order: 00 → 16.
+- Any error stops execution immediately.
 
-```
-1. Read BUILD_STATUS.md
-2. Identify next step with status != complete
-3. Load corresponding codex step file
-4. Execute instructions
-5. Run validation checks
-6. If success → mark step complete
-7. If failure → fix → retry
-8. Continue loop
+---
+
+## Deterministic Command Plan
+
+### Entry Command
+
+```bash
+./build.sh
 ```
 
+### Internal Execution Loop
+
+`build.sh` MUST:
+
+1. Read `/codex/RUNBOOK.md`
+2. Parse `STEP XX` + `File: /codex/...`
+3. Verify each step file exists
+4. Execute step handlers in exact order
+5. Validate runtime after each required step
+6. Exit non-zero on first failure
+
 ---
 
-## STEP RESOLUTION RULE
+## Required Local Services
 
-Steps MUST execute in exact order defined in RUNBOOK.md.
+- PostgreSQL (Docker Compose)
+- Backend service (`uvicorn`)
+- Frontend service (`node frontend/server.js`)
 
-NO skipping  
-NO reordering  
-NO parallel execution unless explicitly defined  
+Required ports:
+
+- `5432` postgres
+- `8000` backend
+- `3000` frontend
 
 ---
 
-## VALIDATION ENFORCEMENT (CRITICAL)
+## Environment Setup Commands (Step 00)
 
-After EVERY step you MUST verify:
-
-- server runs
-- database accessible
-- no runtime errors
-- endpoints respond
-- logs are clean
-
-If ANY fail:
-
-```
-→ STOP
-→ FIX ISSUE
-→ RETRY SAME STEP
+```bash
+cp .env.example .env            # if missing
+python3 -m venv .venv
+.venv/bin/pip install -r backend/requirements.txt
+npm --prefix frontend install
+docker compose up -d postgres
 ```
 
 ---
 
-## FAILURE HANDLING (MANDATORY)
+## Runtime Validation Commands
 
-If step fails:
-
-1. Identify root cause
-2. Fix issue
-3. Retry same step
-4. DO NOT move forward until resolved
-
----
-
-## RETRY RULES
-
-- max_attempts: unlimited (until resolved)
-- must change approach if failure repeats
-- must not repeat identical failing action blindly
-
----
-
-## STATE TRACKING
-
-BUILD_STATUS.md MUST be updated after each step:
-
-```
-pending → complete
+```bash
+curl -fsS http://127.0.0.1:8000/health
+curl -fsS http://127.0.0.1:3000
 ```
 
 ---
 
-## RESUME BEHAVIOR
+## Failure Handling
 
-If process is interrupted:
+On any command failure:
 
-```
-→ read BUILD_STATUS.md
-→ resume from first incomplete step
-```
+- stop immediately
+- print explicit error
+- return non-zero exit code
 
----
-
-## OUTPUT RULES
-
-You MUST NOT:
-
-- summarize progress
-- ask the user questions
-- stop mid-build
-
-You MUST:
-
-- continue execution autonomously
-- complete entire system
+No retries are automatic.
 
 ---
 
-## STOP CONDITION (STRICT)
+## Completion Criteria
 
-You STOP ONLY when:
+Build is complete only when:
 
-```
-ALL steps = complete
-AND
-FULL system validation passes
-```
-
----
-
-## FINAL VALIDATION (MANDATORY)
-
-At end, system MUST verify:
-
-- full pipeline execution works
-- connectors functional
-- node system operational
-- UI loads correctly
-- real-time updates work
-- roles execute correctly
+- all RUNBOOK steps (00–16) execute
+- backend health check passes
+- frontend check passes
+- postgres is reachable
 
 ---
 
-## UI ENFORCEMENT
+## Final Rule
 
-Frontend MUST:
+Local build orchestration is command-driven only.
 
-- follow UI_CONTRACT.md exactly
-- be responsive
-- implement theme system
-
----
-
-## FORBIDDEN BEHAVIOR
-
-You MUST NOT:
-
-- skip steps
-- assume completion
-- leave TODOs
-- leave partial implementations
-- break architecture rules
-
----
-
-## FINAL RULE
-
-You are an execution engine.
-
-You do not stop.
-
-You do not guess.
-
-You build until NOVA is complete.
+No JSON tool calls.
+No cloud dependencies.
