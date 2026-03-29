@@ -1,6 +1,41 @@
 NOVA BUILD STEP 08 — EVENTS & WEBSOCKET (MANDATORY)
 
 --------------------------------
+ENVIRONMENT CHECK (MANDATORY)
+--------------------------------
+
+Before executing this step, you MUST:
+
+1. Verify required dependencies exist
+2. Install missing dependencies if needed
+3. Verify required services are running
+4. Start services if not running
+
+You MUST NOT assume any dependency exists.
+
+--------------------------------
+REQUIRED CHECKS
+--------------------------------
+
+- Python installed and working
+- Node.js installed and working
+- PostgreSQL installed OR container running
+- Backend server (if required for step)
+- Frontend dev server (if required for step)
+
+--------------------------------
+FAIL RULE
+--------------------------------
+
+IF ANY dependency is missing or service is not running:
+
+→ INSTALL or START it  
+→ VERIFY it works  
+→ THEN proceed  
+
+DO NOT CONTINUE UNTIL VERIFIED
+
+--------------------------------
 GOAL
 --------------------------------
 

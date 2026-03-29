@@ -1,26 +1,75 @@
-# NOVA — Documentation Validation (Authoritative)
+NOVA BUILD STEP 16 — DOCUMENTATION VALIDATION (MANDATORY)
 
-## Purpose
+--------------------------------
+GOAL
+--------------------------------
 
-Verifies that the implementation matches ALL system specifications.
+Verify that the FULL system implementation matches ALL documentation.
 
-Ensures:
+This step ensures:
 
-- no drift from architecture
-- no missing features
-- full compliance with design
-
----
-
-## CORE RULE
-
-Implementation MUST match ALL documents in `/docs/01–72`.
-
-No deviation allowed.
+- zero architectural drift
+- zero missing features
+- full compliance with NOVA specifications
 
 ---
 
-## VALIDATION SCOPE
+--------------------------------
+NON-NEGOTIABLE RULES
+--------------------------------
+
+- DO NOT modify any files
+- DO NOT rebuild anything
+- DO NOT install dependencies
+- VALIDATION ONLY
+
+IF ANY FAILURE:
+→ STOP
+→ REPORT ISSUE
+→ DO NOT CONTINUE
+
+---
+
+--------------------------------
+ENVIRONMENT CHECK (MANDATORY)
+--------------------------------
+
+Before executing this step, you MUST:
+
+1. Verify backend server is running
+2. Verify frontend application is running
+3. Verify database is accessible
+4. Verify WebSocket connection is active
+
+You MUST NOT assume system state is valid.
+
+--------------------------------
+REQUIRED CHECKS
+--------------------------------
+
+- Backend API responds successfully
+- Frontend UI loads without error
+- Database connection succeeds
+- WebSocket connection is active
+
+--------------------------------
+FAIL RULE
+--------------------------------
+
+IF any system component is not running:
+
+→ STOP
+→ FIX system
+→ VERIFY all components are operational
+→ THEN proceed
+
+DO NOT CONTINUE UNTIL VERIFIED
+
+---
+
+--------------------------------
+VALIDATION SCOPE (MANDATORY)
+--------------------------------
 
 You MUST validate against:
 
@@ -28,13 +77,14 @@ You MUST validate against:
 /docs/01–72
 ```
 
-NOT 01–69  
 NOT partial sets  
 NOT assumed subsets  
 
 ---
 
-## VALIDATION TASKS
+--------------------------------
+VALIDATION TASKS
+--------------------------------
 
 ---
 
@@ -44,7 +94,7 @@ Verify:
 
 - pipeline controls ALL execution
 - no direct execution exists
-- tools only execute via pipeline
+- tools execute ONLY via pipeline
 - connectors handle ALL external calls
 
 ---
@@ -55,11 +105,21 @@ Verify:
 
 - canonical data model implemented exactly
 - database schema matches spec
-- no missing fields
+- no missing or extra fields
 
 ---
 
-### 3. WORKFLOW ENGINE
+### 3. PIPELINE ENGINE
+
+Verify:
+
+- all stages implemented
+- stage order correct
+- no stage skipped
+
+---
+
+### 4. WORKFLOW ENGINE
 
 Verify:
 
@@ -69,7 +129,7 @@ Verify:
 
 ---
 
-### 4. REAL-TIME SYSTEM
+### 5. REAL-TIME SYSTEM
 
 Verify:
 
@@ -79,7 +139,7 @@ Verify:
 
 ---
 
-### 5. UI CONTRACT
+### 6. UI CONTRACT
 
 Verify:
 
@@ -90,7 +150,17 @@ Verify:
 
 ---
 
-### 6. SECURITY
+### 7. THEME SYSTEM
+
+Verify:
+
+- system/dark/light modes implemented
+- switching is instant
+- no layout breakage
+
+---
+
+### 8. SECURITY
 
 Verify:
 
@@ -101,17 +171,17 @@ Verify:
 
 ---
 
-### 7. CONNECTOR FRAMEWORK
+### 9. CONNECTOR FRAMEWORK
 
 Verify:
 
 - ALL integrations use connectors
-- no direct API calls
+- NO direct API calls
 - mapping enforced
 
 ---
 
-### 8. ROLE SYSTEM
+### 10. ROLE SYSTEM
 
 Verify:
 
@@ -121,7 +191,7 @@ Verify:
 
 ---
 
-### 9. TENANCY MODEL
+### 11. TENANCY MODEL
 
 Verify:
 
@@ -131,7 +201,7 @@ Verify:
 
 ---
 
-### 10. STORAGE SYSTEM
+### 12. STORAGE SYSTEM
 
 Verify:
 
@@ -141,17 +211,41 @@ Verify:
 
 ---
 
-## VALIDATION METHOD
+### 13. QUEUE & WORKERS
 
-For each rule:
+Verify:
 
-- compare implementation to spec
-- confirm behavior matches exactly
+- async execution used
+- no direct execution bypass
+- idempotency enforced
+
+---
+
+### 14. NODE SYSTEM
+
+Verify:
+
+- node registration works
+- heartbeat updates correctly
+- tasks routed correctly
+
+---
+
+--------------------------------
+VALIDATION METHOD
+--------------------------------
+
+For EACH rule:
+
+- compare implementation to documentation
+- confirm behavior matches EXACTLY
 - reject any mismatch
 
 ---
 
-## VALIDATION OUTPUT
+--------------------------------
+VALIDATION OUTPUT (MANDATORY)
+--------------------------------
 
 You MUST produce:
 
@@ -165,38 +259,50 @@ You MUST produce:
 
 ---
 
-## FAILURE RULE
+--------------------------------
+FAIL CONDITIONS
+--------------------------------
 
-If ANY mismatch found:
+FAIL IF:
 
-→ FAIL  
-→ list exact issue  
-→ STOP execution  
+- ANY mismatch exists
+- ANY feature missing
+- ANY rule violated
+- ANY ambiguity detected
+
+IF FAIL:
+
+→ LIST exact issue
+→ STOP execution
 
 ---
 
-## COMPLETION CRITERIA
+--------------------------------
+COMPLETION CRITERIA
+--------------------------------
 
-Validation passes ONLY IF:
+COMPLETE ONLY IF:
 
 - ALL docs (01–72) match implementation
-- NO mismatches exist
-- NO ambiguity exists
+- ZERO mismatches exist
+- ZERO ambiguity remains
 
 ---
 
-## FORBIDDEN BEHAVIOR
+--------------------------------
+STATE UPDATE
+--------------------------------
 
-You MUST NOT:
-
-- skip documents
-- assume compliance
-- partially validate
+16_DOCS_VALIDATION: complete
 
 ---
 
-## FINAL RULE
+--------------------------------
+FINAL RULE
+--------------------------------
 
 Documentation defines system truth.
 
-If implementation does not match docs → system is invalid.
+If implementation does not match documentation → system is INVALID.
+
+STOP when validation completes successfully.
