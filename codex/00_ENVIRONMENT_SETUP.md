@@ -4,14 +4,14 @@ NOVA BUILD STEP 00 — ENVIRONMENT SETUP (MANDATORY)
 GOAL
 --------------------------------
 
-Prepare a fully controlled environment BEFORE build begins.
+Prepare a fully controlled and deterministic environment for NOVA build.
 
-This step eliminates:
+This step ensures:
 
-- version conflicts
-- port conflicts
-- missing dependencies
-- service failures
+- no missing dependencies
+- no port conflicts
+- all required services are available
+- build can proceed safely
 
 ---
 
@@ -21,6 +21,38 @@ NON-NEGOTIABLE RULES
 
 - DO NOT skip this step
 - DO NOT assume environment is ready
+- DO NOT continue until all checks pass
+
+IF ANY ERROR:
+→ FIX
+→ RETRY
+
+---
+
+--------------------------------
+ENVIRONMENT CHECK (MANDATORY)
+--------------------------------
+
+Before executing this step, you MUST:
+
+1. Verify required dependencies exist
+2. Install missing dependencies
+3. Verify required services are running
+4. Start services if not running
+
+You MUST NOT assume any dependency exists.
+
+---
+
+--------------------------------
+REQUIRED CHECKS
+--------------------------------
+
+- Python 3.11+ installed and working
+- Node.js (LTS) installed and working
+- npm or pnpm installed
+- PostgreSQL installed OR running via container
+- Git installed
 
 ---
 
@@ -28,16 +60,16 @@ NON-NEGOTIABLE RULES
 STEP 1 — PORT VALIDATION
 --------------------------------
 
-Verify ports are free:
+Verify ports are available:
 
 - 3000 (frontend)
 - 8000 (backend)
 - 5432 (postgres)
 
-IF occupied:
+IF port is in use:
 
-→ stop service OR change port  
-→ confirm port is free  
+→ stop conflicting service OR change port  
+→ verify port is free  
 
 ---
 
@@ -45,20 +77,18 @@ IF occupied:
 STEP 2 — PYTHON SETUP
 --------------------------------
 
-Ensure:
+IF Python missing or incorrect:
 
-- Python 3.11+
+→ install Python 3.11+
 
-IF not:
+Create virtual environment:
 
-→ install correct version  
-
-Create virtual env:
-
-```
 python -m venv venv
-source venv/bin/activate
-```
+
+Activate:
+
+source venv/bin/activate (Mac/Linux)
+venv\Scripts\activate (Windows)
 
 ---
 
@@ -66,13 +96,14 @@ source venv/bin/activate
 STEP 3 — NODE SETUP
 --------------------------------
 
-Ensure:
+IF Node missing:
 
-- Node LTS installed
+→ install Node LTS
 
-IF not:
+Verify:
 
-→ install Node LTS  
+node -v
+npm -v
 
 ---
 
@@ -80,38 +111,34 @@ IF not:
 STEP 4 — POSTGRES SETUP
 --------------------------------
 
-Preferred: Docker
+IF PostgreSQL not running:
 
-```
+Use Docker:
+
 docker run -d \
   --name nova-postgres \
   -e POSTGRES_PASSWORD=postgres \
   -e POSTGRES_DB=nova \
   -p 5432:5432 \
   postgres
-```
 
-Verify connection.
+Verify connection works.
 
 ---
 
 --------------------------------
-STEP 5 — DEPENDENCY PRE-INSTALL
+STEP 5 — BASE DEPENDENCY INSTALL
 --------------------------------
 
-Install base packages:
+Install baseline dependencies:
 
 Backend:
 
-```
 pip install fastapi uvicorn sqlalchemy psycopg2-binary
-```
 
 Frontend:
 
-```
 npm install
-```
 
 ---
 
@@ -121,32 +148,39 @@ STEP 6 — SERVICE VALIDATION
 
 Verify:
 
-- Python runs
-- Node runs
-- Postgres accepts connections
+- Python executes
+- Node executes
+- PostgreSQL accepts connections
+- no errors present
 
 ---
 
 --------------------------------
-STEP 7 — LOGGING ENABLEMENT
+VALIDATION (MANDATORY)
 --------------------------------
 
-Ensure logs are visible:
+ALL MUST PASS:
 
-- backend logs
-- worker logs
+- dependencies installed
+- services running
+- ports available
+- no errors in setup
 
 ---
 
 --------------------------------
-STEP 8 — SAFE BASELINE
+FAIL CONDITIONS
 --------------------------------
 
-Confirm:
+FAIL IF:
 
-- no errors
-- all services reachable
-- ports clean
+- dependency missing
+- service not running
+- port conflict unresolved
+
+IF FAIL:
+→ FIX
+→ RETRY
 
 ---
 
@@ -157,8 +191,8 @@ COMPLETION CRITERIA
 COMPLETE ONLY IF:
 
 - environment stable
-- all dependencies installed
-- all services reachable
+- dependencies installed
+- services operational
 
 ---
 
