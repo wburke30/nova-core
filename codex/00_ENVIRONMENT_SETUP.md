@@ -4,14 +4,13 @@ NOVA BUILD STEP 00 — ENVIRONMENT SETUP (MANDATORY)
 GOAL
 --------------------------------
 
-Prepare a fully controlled and deterministic environment for NOVA build.
+Prepare a deterministic, verifiable environment for NOVA build.
 
-This step ensures:
+This step MUST:
 
-- no missing dependencies
-- no port conflicts
-- all required services are available
-- build can proceed safely
+- ensure all dependencies exist
+- ensure all required services are running
+- produce a verifiable artifact
 
 ---
 
@@ -21,7 +20,7 @@ NON-NEGOTIABLE RULES
 
 - DO NOT skip this step
 - DO NOT assume environment is ready
-- DO NOT continue until all checks pass
+- DO NOT proceed without verification
 
 IF ANY ERROR:
 → FIX
@@ -33,26 +32,18 @@ IF ANY ERROR:
 ENVIRONMENT CHECK (MANDATORY)
 --------------------------------
 
-Before executing this step, you MUST:
+You MUST verify:
 
-1. Verify required dependencies exist
-2. Install missing dependencies
-3. Verify required services are running
-4. Start services if not running
-
-You MUST NOT assume any dependency exists.
-
----
-
---------------------------------
-REQUIRED CHECKS
---------------------------------
-
-- Python 3.11+ installed and working
-- Node.js (LTS) installed and working
+- Python 3.11+ installed
+- Node.js (LTS) installed
 - npm or pnpm installed
-- PostgreSQL installed OR running via container
+- PostgreSQL installed OR running in container
 - Git installed
+
+IF missing:
+
+→ INSTALL  
+→ VERIFY  
 
 ---
 
@@ -60,45 +51,34 @@ REQUIRED CHECKS
 STEP 1 — PORT VALIDATION
 --------------------------------
 
-Verify ports are available:
+Ensure ports are available:
 
-- 3000 (frontend)
-- 8000 (backend)
-- 5432 (postgres)
+- 3000
+- 8000
+- 5432
 
-IF port is in use:
+IF occupied:
 
-→ stop conflicting service OR change port  
-→ verify port is free  
+→ free port OR reassign  
+→ verify availability  
 
 ---
 
 --------------------------------
-STEP 2 — PYTHON SETUP
+STEP 2 — PYTHON ENVIRONMENT
 --------------------------------
-
-IF Python missing or incorrect:
-
-→ install Python 3.11+
 
 Create virtual environment:
 
 python -m venv venv
 
-Activate:
-
-source venv/bin/activate (Mac/Linux)
-venv\Scripts\activate (Windows)
+Activate environment.
 
 ---
 
 --------------------------------
-STEP 3 — NODE SETUP
+STEP 3 — NODE VALIDATION
 --------------------------------
-
-IF Node missing:
-
-→ install Node LTS
 
 Verify:
 
@@ -113,7 +93,7 @@ STEP 4 — POSTGRES SETUP
 
 IF PostgreSQL not running:
 
-Use Docker:
+Start using Docker:
 
 docker run -d \
   --name nova-postgres \
@@ -122,15 +102,13 @@ docker run -d \
   -p 5432:5432 \
   postgres
 
-Verify connection works.
+Verify connection succeeds.
 
 ---
 
 --------------------------------
 STEP 5 — BASE DEPENDENCY INSTALL
 --------------------------------
-
-Install baseline dependencies:
 
 Backend:
 
@@ -151,7 +129,20 @@ Verify:
 - Python executes
 - Node executes
 - PostgreSQL accepts connections
-- no errors present
+
+---
+
+--------------------------------
+STEP 7 — ENVIRONMENT MARKER (MANDATORY)
+--------------------------------
+
+Create file:
+
+/backend/.env.ready
+
+Contents:
+
+ENVIRONMENT_READY=true
 
 ---
 
@@ -164,7 +155,8 @@ ALL MUST PASS:
 - dependencies installed
 - services running
 - ports available
-- no errors in setup
+- marker file exists
+- marker file content correct
 
 ---
 
@@ -174,9 +166,9 @@ FAIL CONDITIONS
 
 FAIL IF:
 
-- dependency missing
+- any dependency missing
 - service not running
-- port conflict unresolved
+- marker file missing
 
 IF FAIL:
 → FIX
@@ -191,8 +183,8 @@ COMPLETION CRITERIA
 COMPLETE ONLY IF:
 
 - environment stable
-- dependencies installed
-- services operational
+- marker file created
+- all checks pass
 
 ---
 
