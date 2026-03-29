@@ -41,6 +41,11 @@ You MUST NOT assume anything exists.
 
 ---
 
+### STEP 00 — ENVIRONMENT SETUP
+File: `/codex/00_ENVIRONMENT_SETUP.md`
+
+---
+
 ### STEP 01 — BOOTSTRAP
 File: `/codex/01_BOOTSTRAP.md`
 
